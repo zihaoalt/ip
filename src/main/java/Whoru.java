@@ -17,6 +17,26 @@ public class Whoru {
         new Whoru().listenCommand();
     }
 
+    private int extractTaskNumber(String line) {
+        int intStartIndex = -1;
+        for (int i = 0; i < line.length(); i++) {
+            if (Character.isDigit(line.charAt(i))) {
+                intStartIndex = i;
+                break;
+            }
+        }
+
+        if (intStartIndex == -1) {
+            return -1;
+        }
+
+        int intEndIndex = intStartIndex;
+        while (intEndIndex < line.length() && Character.isDigit(line.charAt(intEndIndex))) {
+            intEndIndex++;
+        }
+        return Integer.parseInt(line.substring(intStartIndex, intEndIndex));
+    }
+
     private void listenCommand() {
         Scanner in = new Scanner(System.in);
         String line;
@@ -44,6 +64,24 @@ public class Whoru {
                     count++;
                 }
                 outString = outString + "____________________________________________________________\n";
+                System.out.println(outString);
+            } else if (line.trim().contains("mark")) {
+                int taskNumber = this.extractTaskNumber(line.trim());
+                if (taskNumber == -1 || taskNumber > this.taskCount) {
+                    outString = "____________________________________________________________\n"
+                                    + "     Provide a valid task number to continue\n"
+                                    + "____________________________________________________________\n";
+                    System.out.println(outString);
+                    continue;
+                }
+
+                Task task = tasks[taskNumber - 1];
+                task.updateDoneStatus(line.trim().contains("unmark") ? false : true);
+                String middleLine = line.trim().contains("unmark") ? "OK, I've marked this task as not done yet: \n" : "Nice! I've marked this task as done:\n";
+                outString = "____________________________________________________________\n"
+                                + "     " + middleLine
+                                + "     " + task.getPrintingString() + "\n"
+                                + "____________________________________________________________\n";
                 System.out.println(outString);
             } else {
                 String taskContent = line.trim();
