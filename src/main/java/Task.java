@@ -1,29 +1,39 @@
 public class Task {
+
     protected String description;
     protected boolean isDone;
+    protected TaskSubclassType taskSubclassType;
 
-    public Task() {
+    Task() {
         this("");
     }
 
-    public Task(String description) {
+    Task(String description) {
         this.description = description;
         this.isDone = false;
+        this.taskSubclassType = null;
     }
 
-    public String getStatusIcon() {
+    Task(String description, TaskSubclassType taskSubclassType) {
+        this.description = description;
+        this.isDone = false;
+        this.taskSubclassType = taskSubclassType;
+    }
+
+    protected String getStatusIcon() {
         return (isDone ? "X" : " "); // mark done task with X
     }
 
-    public String getDescription() {
+    protected String getDescription() {
         return this.description;
     }
 
-    public void updateDoneStatus(Boolean bool) {
+    protected void updateDoneStatus(Boolean bool) {
         this.isDone = bool;
     }
 
-    public String getPrintingString() {
+    @Override
+    public String toString() {
         return "[" + this.getStatusIcon() + "]" + this.getDescription();
     }
 }
