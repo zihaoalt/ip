@@ -114,7 +114,7 @@ public class Whoru {
             return;
         }
 
-        Task task = tasks[taskIndex];
+        Task task = tasks[taskIndex - 1]; //zero base index and 1 base index
         task.updateDoneStatus(shouldMarkDone);
         printMarkResult(task, shouldMarkDone);
     }
