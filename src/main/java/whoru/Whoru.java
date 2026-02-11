@@ -7,6 +7,7 @@ import whoru.task.Todo;
 import whoru.task.exception.EmptyDescriptionException;
 import whoru.task.exception.InvalidTaskNumberException;
 import whoru.task.exception.MissingTimeException;
+import whoru.task.exception.EmptyTaskCommandException;
 
 import java.util.Scanner;
 import static whoru.utils.formatter.formatErrorMessage;
@@ -34,6 +35,16 @@ public class Whoru {
         while (true) {
             String line = scanner.nextLine().trim();
 
+            //solution below inspired by https://github.com/NUS-CS2113-AY2526-S2/ip/pull/140 during code review practice
+            //change from comparing the start of the string to split using space for safety and especially task number parsing
+            if (line.isEmpty()) {
+                throw new EmptyTaskCommandException("Start with a non-empty command");
+            }
+            String[] parts = line.trim().split("\\s+", 2);
+            String command = parts[0].toLowerCase(); // use for task number
+            String argument1 = (parts.length > 1) ? parts[1] : "";
+
+
             if (line.equalsIgnoreCase("bye")) {
                 printBye();
                 break;
@@ -41,13 +52,13 @@ public class Whoru {
                 printList();
             } else if (line.startsWith("mark")) {
                 try {
-                    handleMarkCommand(line, true);
+                    handleMarkCommand(argument1, true);
                 } catch (InvalidTaskNumberException e) {
                     System.out.println(e.getMessage());
                 }
             } else if (line.startsWith("unmark")) {
                 try {
-                    handleMarkCommand(line, false);
+                    handleMarkCommand(argument1, false);
                 } catch (InvalidTaskNumberException e) {
                     System.out.println(e.getMessage());
                 }
@@ -137,23 +148,23 @@ public class Whoru {
         return;
     }
 
-    private void handleMarkCommand(String input, boolean shouldMarkDone) throws InvalidTaskNumberException {
+    private void handleMarkCommand(String numberPart, boolean shouldMarkDone) throws InvalidTaskNumberException {
         String command = shouldMarkDone ? "mark" : "unmark";
-        String numberPart = input.substring(command.length()).trim();
+        try {
+            int taskIndex = Integer.parseInt(numberPart);
 
-        int taskIndex = extractTaskNumber(numberPart);
-        if (taskIndex == -1) {
-            String errorMessage = formatErrorMessage("Please provide non-empty task number.");
-            throw new InvalidTaskNumberException(errorMessage);
-        }
-        if (taskIndex > taskCount) {
-            String errorMessage = formatErrorMessage("Task index out of bounds.");
-            throw new InvalidTaskNumberException(errorMessage);
+            if (taskIndex > taskCount ||  taskIndex < 1) {
+                String errorMessage = formatErrorMessage("Task index out of bounds.");
+                throw new InvalidTaskNumberException(errorMessage);
+            }
+
+            Task task = tasks[taskIndex - 1]; //zero base index and 1 base index
+            task.updateDoneStatus(shouldMarkDone);
+            printMarkResult(task, shouldMarkDone);
+        } catch (NumberFormatException e) {
+            throw new InvalidTaskNumberException(formatErrorMessage("Please enter a valid task number"));
         }
 
-        Task task = tasks[taskIndex - 1]; //zero base index and 1 base index
-        task.updateDoneStatus(shouldMarkDone);
-        printMarkResult(task, shouldMarkDone);
     }
 
     private int extractTaskNumber(String line) {
