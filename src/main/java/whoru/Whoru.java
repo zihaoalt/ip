@@ -1,4 +1,15 @@
+package whoru;
+
+import whoru.task.Deadline;
+import whoru.task.Event;
+import whoru.task.Task;
+import whoru.task.Todo;
+import whoru.task.exception.EmptyDescriptionException;
+import whoru.task.exception.InvalidTaskNumberException;
+import whoru.task.exception.MissingTimeException;
+
 import java.util.Scanner;
+import static whoru.utils.formatter.formatErrorMessage;
 
 public class Whoru {
     private static final int MAX_TASKS = 100;
@@ -9,7 +20,7 @@ public class Whoru {
 
     public static void main(String[] args) {
         System.out.println(DIVIDE);
-        System.out.println(" Hello! I'm Whoru");
+        System.out.println(" Hello! I'm whoru.Whoru");
         System.out.println(" What can I do for you?");
         System.out.println(DIVIDE);
 
@@ -29,63 +40,82 @@ public class Whoru {
             } else if (line.equalsIgnoreCase("list")) {
                 printList();
             } else if (line.startsWith("mark")) {
-                handleMarkCommand(line, true);
+                try {
+                    handleMarkCommand(line, true);
+                } catch (InvalidTaskNumberException e) {
+                    System.out.println(e.getMessage());
+                }
             } else if (line.startsWith("unmark")) {
-                handleMarkCommand(line, false);
+                try {
+                    handleMarkCommand(line, false);
+                } catch (InvalidTaskNumberException e) {
+                    System.out.println(e.getMessage());
+                }
             } else if (line.startsWith("todo")) {
-                addTodo(line);
+                try {
+                    addTodo(line);
+                } catch (EmptyDescriptionException e) {
+                    System.out.println(e.getMessage());
+                }
+
             } else if (line.startsWith("deadline")) {
-                addDeadline(line);
+                try {
+                    addDeadline(line);
+                } catch (EmptyDescriptionException e) {
+                    System.out.println(e.getMessage());
+                } catch (MissingTimeException e) {
+                    System.out.println(e.getMessage());
+                }
             } else if (line.startsWith("event")) {
-                addEvent(line);
+                try {
+                    addEvent(line);
+                } catch (EmptyDescriptionException e) {
+                    System.out.println(e.getMessage());
+                } catch (MissingTimeException e) {
+                    System.out.println(e.getMessage());
+                }
+            } else {
+                handleUnknownCommand();
             }
 
         }
     }
 
-    private void addTodo(String input) {
+    private void addTodo(String input) throws EmptyDescriptionException {
         String description = input.substring("todo".length()).trim(); // start from space after todo
         if (description.isEmpty()) {
-            System.out.println(DIVIDE);
-            System.out.println("empty task description");
-            System.out.println(DIVIDE);
-            return;
+            String errorMessage = formatErrorMessage("empty task description");
+            throw new EmptyDescriptionException(errorMessage);
         }
 
         addTask(new Todo(description));
     }
 
-    private void addDeadline(String input) {
+    private void addDeadline(String input) throws EmptyDescriptionException, MissingTimeException {
         int byIndex = input.indexOf("/by");
         if (byIndex == -1) {
-            System.out.println(DIVIDE);
-            System.out.println("Missing by time");
-            System.out.println(DIVIDE);
-            return;
+            String errorMessage = formatErrorMessage("Missing by time");
+            throw new MissingTimeException(errorMessage);
         }
 
         String description = input.substring("deadline".length(), byIndex).trim();
         String by = input.substring(byIndex + "/by".length()).trim();
 
         if (description.isEmpty() || by.isEmpty()) {
-            System.out.println(DIVIDE);
-            System.out.println("empty task description");
-            System.out.println(DIVIDE);
-            return;
+            String errorMessage = formatErrorMessage("empty task description");
+            throw new EmptyDescriptionException(errorMessage);
         }
 
         addTask(new Deadline(description, by));
     }
 
-    private void addEvent(String input) {
+    private void addEvent(String input) throws EmptyDescriptionException, MissingTimeException {
         int fromIndex = input.indexOf("/from");
         int toIndex = input.indexOf("/to");
 
         if (fromIndex == -1 || toIndex == -1 || toIndex < fromIndex) {
-            System.out.println(DIVIDE);
-            System.out.println("Missing from or to time");
-            System.out.println(DIVIDE);
-            return;
+            String errorMessage = formatErrorMessage("Missing from or to time");
+            throw new MissingTimeException(errorMessage);
         }
 
         String description = input.substring("event".length(), fromIndex).trim();
@@ -93,25 +123,32 @@ public class Whoru {
         String to = input.substring(toIndex + "/to".length()).trim();
 
         if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
-            System.out.println(DIVIDE);
-            System.out.println("empty task description");
-            System.out.println(DIVIDE);
-            return;
+            String errorMessage = formatErrorMessage("empty task description");
+            throw new EmptyDescriptionException(errorMessage);
         }
 
         addTask(new Event(description, from, to));
     }
 
-    private void handleMarkCommand(String input, boolean shouldMarkDone) {
+    private void handleUnknownCommand() {
+        System.out.println(DIVIDE);
+        System.out.println("Sry unknown command detected, try commands like todo/deadline");
+        System.out.println(DIVIDE);
+        return;
+    }
+
+    private void handleMarkCommand(String input, boolean shouldMarkDone) throws InvalidTaskNumberException {
         String command = shouldMarkDone ? "mark" : "unmark";
         String numberPart = input.substring(command.length()).trim();
 
         int taskIndex = extractTaskNumber(numberPart);
         if (taskIndex == -1) {
-            System.out.println(DIVIDE);
-            System.out.println("Please provide a valid task number.");
-            System.out.println(DIVIDE);
-            return;
+            String errorMessage = formatErrorMessage("Please provide non-empty task number.");
+            throw new InvalidTaskNumberException(errorMessage);
+        }
+        if (taskIndex > taskCount) {
+            String errorMessage = formatErrorMessage("Task index out of bounds.");
+            throw new InvalidTaskNumberException(errorMessage);
         }
 
         Task task = tasks[taskIndex - 1]; //zero base index and 1 base index
