@@ -1,34 +1,36 @@
+package whoru.task;
+
 public class Task {
 
     protected String description;
     protected boolean isDone;
     protected TaskSubclassType taskSubclassType;
 
-    Task() {
+    public Task() {
         this("");
     }
 
-    Task(String description) {
+    public Task(String description) {
         this.description = description;
         this.isDone = false;
         this.taskSubclassType = null;
     }
 
-    Task(String description, TaskSubclassType taskSubclassType) {
+    public Task(String description, TaskSubclassType taskSubclassType) {
         this.description = description;
         this.isDone = false;
         this.taskSubclassType = taskSubclassType;
     }
 
-    protected String getStatusIcon() {
+    public String getStatusIcon() {
         return (isDone ? "X" : " "); // mark done task with X
     }
 
-    protected String getDescription() {
+    public String getDescription() {
         return this.description;
     }
 
-    protected void updateDoneStatus(Boolean bool) {
+    public void updateDoneStatus(Boolean bool) {
         this.isDone = bool;
     }
 

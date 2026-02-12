@@ -1,10 +1,12 @@
+package whoru.task;
+
 public class Event extends Task {
 
     protected String from;
     protected String to;
     private static TaskSubclassType EVENT;
 
-    Event(String description, String from, String to) {
+    public Event(String description, String from, String to) {
         super(description, EVENT);
         this.from = from;
         this.to = to;

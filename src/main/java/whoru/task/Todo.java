@@ -1,8 +1,10 @@
+package whoru.task;
+
 public class Todo extends Task {
 
     private static TaskSubclassType TODO;
 
-    Todo(String description) {
+    public Todo(String description) {
         super(description, TODO);
     }
 
