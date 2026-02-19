@@ -8,16 +8,20 @@ import whoru.task.exception.EmptyDescriptionException;
 import whoru.task.exception.InvalidTaskNumberException;
 import whoru.task.exception.MissingTimeException;
 import whoru.task.exception.EmptyTaskCommandException;
+import whoru.storage.Storage;
 
+import java.io.IOException;
 import java.util.Scanner;
 import static whoru.utils.formatter.formatErrorMessage;
+import java.util.ArrayList;
+
 
 public class Whoru {
     private static final int MAX_TASKS = 100;
+
     private static final String DIVIDE = "____________________________________________________________";
 
-    private final Task[] tasks = new Task[MAX_TASKS];
-    private int taskCount = 0;
+    private final ArrayList<Task> tasks = new ArrayList<>(MAX_TASKS);
 
     public static void main(String[] args) {
         System.out.println(DIVIDE);
@@ -26,8 +30,18 @@ public class Whoru {
         System.out.println(DIVIDE);
 
         Whoru whoru = new Whoru();
+        try {
+            Storage.setupStorageFile(whoru.tasks);
+        } catch (IOException e) {
+            System.out.println(DIVIDE);
+            System.out.println(" Errors occurred during setting up storage file");
+            System.out.println(e.getMessage());
+            System.out.println(DIVIDE);
+        }
+
         whoru.listenForCommands();
     }
+
 
     private void listenForCommands() {
         Scanner scanner = new Scanner(System.in);
@@ -72,17 +86,13 @@ public class Whoru {
             } else if (line.startsWith("deadline")) {
                 try {
                     addDeadline(line);
-                } catch (EmptyDescriptionException e) {
-                    System.out.println(e.getMessage());
-                } catch (MissingTimeException e) {
+                } catch (EmptyDescriptionException | MissingTimeException e) {
                     System.out.println(e.getMessage());
                 }
             } else if (line.startsWith("event")) {
                 try {
                     addEvent(line);
-                } catch (EmptyDescriptionException e) {
-                    System.out.println(e.getMessage());
-                } catch (MissingTimeException e) {
+                } catch (EmptyDescriptionException | MissingTimeException e) {
                     System.out.println(e.getMessage());
                 }
             } else {
@@ -153,12 +163,12 @@ public class Whoru {
         try {
             int taskIndex = Integer.parseInt(numberPart);
 
-            if (taskIndex > taskCount ||  taskIndex < 1) {
+            if (taskIndex > tasks.size() ||  taskIndex < 1) {
                 String errorMessage = formatErrorMessage("Task index out of bounds.");
                 throw new InvalidTaskNumberException(errorMessage);
             }
 
-            Task task = tasks[taskIndex - 1]; //zero base index and 1 base index
+            Task task = tasks.get(taskIndex - 1); //zero base index and 1 base index
             task.updateDoneStatus(shouldMarkDone);
             printMarkResult(task, shouldMarkDone);
         } catch (NumberFormatException e) {
@@ -188,15 +198,16 @@ public class Whoru {
     }
 
     private void addTask(Task task) {
-        if (taskCount >= MAX_TASKS) {
+        tasks.add(task);
+        try {
+            Storage.updateStorageFile(task);
+        } catch (IOException e) {
             System.out.println(DIVIDE);
-            System.out.println("Exceeding max no of tasks: " + MAX_TASKS);
+            System.out.println(" Errors occurred during setting up storage file");
+            System.out.println(e.getMessage());
             System.out.println(DIVIDE);
-            return;
         }
 
-        tasks[taskCount] = task;
-        taskCount++;
         printAddResult(task);
     }
 
@@ -204,7 +215,7 @@ public class Whoru {
         System.out.println(DIVIDE);
         System.out.println(" Got it. I've added this task:");
         System.out.println("   " + task);
-        System.out.println(" Now you have " + taskCount + " tasks in the list.");
+        System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
         System.out.println(DIVIDE);
     }
 
@@ -212,8 +223,8 @@ public class Whoru {
         System.out.println(DIVIDE);
         System.out.println(" Here are the tasks in your list:");
 
-        for (int i = 0; i < taskCount; i++) {
-            System.out.println(" " + (i + 1) + "." + tasks[i]);
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println(" " + (i + 1) + "." + tasks.get(i));
         }
 
         System.out.println(DIVIDE);
