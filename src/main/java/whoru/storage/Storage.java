@@ -38,6 +38,12 @@ public class Storage {
         }
     }
 
+    public static void deleteTask(int taskIndex) throws IOException {
+        List<String> lines = Files.readAllLines(FILE_PATH);
+        lines.remove(taskIndex);
+        Files.write(FILE_PATH, lines, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE); // overwrite entire file
+    }
+
     private static Task parseLine(String line) {
         String trimmed = line.trim();
         if (trimmed.isEmpty()) {

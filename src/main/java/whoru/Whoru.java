@@ -111,9 +111,15 @@ public class Whoru {
             int taskIndex = Integer.parseInt(numberPart);
 
             Task task = tasks.remove(taskIndex - 1); //zero base index and 1 base index
+            Storage.deleteTask(taskIndex - 1);
             printDeleteResult(task);
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             throw new InvalidTaskNumberException(formatErrorMessage("Please enter a valid task number"));
+        } catch (IOException e) {
+            System.out.println(DIVIDE);
+            System.out.println(" Errors occurred during updating storage file");
+            System.out.println(e.getMessage());
+            System.out.println(DIVIDE);
         }
 
     }
@@ -190,7 +196,6 @@ public class Whoru {
                 throw new InvalidTaskNumberException(errorMessage);
             }
 
-            Task task = tasks.get(taskIndex - 1); //zero base index and 1 base index
             Task task = tasks.get(taskIndex - 1); //zero base index and 1 base index
             task.updateDoneStatus(shouldMarkDone);
             printMarkResult(task, shouldMarkDone);
