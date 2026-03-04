@@ -8,6 +8,11 @@ import whoru.task.Event;
 import whoru.tasklist.TaskList;
 import whoru.ui.Ui;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 import static whoru.utils.formatter.formatErrorMessage;
 
 public class AddEventCommand extends Command {
@@ -24,12 +29,25 @@ public class AddEventCommand extends Command {
         String from = fullCommand.substring(fromIndex + "/from".length(), toIndex).trim();
         String to = fullCommand.substring(toIndex + "/to".length()).trim();
 
+
         if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
             String errorMessage = "empty task description";
             throw new EmptyDescriptionException(errorMessage);
         }
 
-        addTask(new Event(description, from, to),  tasks, ui, storage);
+        try {
+            LocalDate fromDt = LocalDate.parse(from);
+            LocalDate toDt = LocalDate.parse(to);
+
+            if (toDt.isBefore(fromDt)) {
+                throw new MissingTimeException("to is before from time, wrong date format");
+            }
+
+            addTask(new Event(description, fromDt, toDt),  tasks, ui, storage);
+        } catch (DateTimeParseException e) {
+            throw new MissingTimeException("Use date format yyyy-mm-dd");
+        }
+
     };
 
     public boolean isExit() {

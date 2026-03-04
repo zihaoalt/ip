@@ -8,6 +8,9 @@ import whoru.task.Deadline;
 import whoru.tasklist.TaskList;
 import whoru.ui.Ui;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
 import static whoru.utils.formatter.formatErrorMessage;
 
 public class AddDeadlineCommand extends Command {
@@ -26,7 +29,14 @@ public class AddDeadlineCommand extends Command {
             throw new EmptyDescriptionException(errorMessage);
         }
 
-        addTask(new Deadline(description, by), tasks, ui, storage);
+        LocalDate byDate;
+        try {
+            byDate = LocalDate.parse(by); // expects yyyy-mm-dd
+        } catch (DateTimeParseException e) {
+            throw new MissingTimeException("Use date format yyyy-mm-dd");
+        }
+
+        addTask(new Deadline(description, byDate), tasks, ui, storage);
     };
 
     public boolean isExit() {

@@ -10,6 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,13 +77,13 @@ public class Storage {
                 if (arguments.length < 4) {
                     return null;
                 }
-                task = new Deadline(description, arguments[3]);
+                task = new Deadline(description, LocalDate.parse(arguments[3]));
                 break;
             case "E":
                 if (arguments.length < 5) {
                     return null;
                 }
-                task = new Event(description, arguments[3], arguments[4]);
+                task = new Event(description, LocalDate.parse(arguments[3]), LocalDate.parse(arguments[4]));
                 break;
             default:
                 return null;
