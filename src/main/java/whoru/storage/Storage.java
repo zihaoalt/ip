@@ -3,6 +3,7 @@ import whoru.task.Deadline;
 import whoru.task.Event;
 import whoru.task.Task;
 import whoru.task.Todo;
+import whoru.tasklist.TaskList;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,22 +14,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Storage {
-    private static final Path FILE_PATH = Paths.get("./data/whoru.txt");
-    private static final Path DATA_DIR = Paths.get("./data");
     private static final String FORMAT = " | "; // this looks like space | space
+    private final Path filePath;
 
-    public static void setupStorageFile(ArrayList<Task> tasks) throws IOException {
-        Files.createDirectories(DATA_DIR);
-
-        if (Files.notExists(FILE_PATH)) {
-            Files.createFile(FILE_PATH);
-        }
-
-        updateTasksList(tasks);
+    public Storage(String filePath) {
+        this.filePath = Path.of(filePath);
     }
 
-    public static void updateTasksList(ArrayList<Task> tasks) throws IOException {
-        List<String> lines = Files.readAllLines(FILE_PATH);
+    public void setupStorageFile() throws IOException {
+        Files.createDirectories(filePath.getParent());
+
+        if (Files.notExists(filePath)) {
+            Files.createFile(filePath);
+        }
+    }
+
+    public TaskList load() throws IOException {
+        setupStorageFile();
+        List<String> lines = Files.readAllLines(filePath);
+        TaskList tasks = new TaskList();
 
         for (String line : lines) {
             Task task = parseLine(line);
@@ -36,15 +40,17 @@ public class Storage {
                 tasks.add(task);
             }
         }
+
+        return tasks;
     }
 
-    public static void deleteTask(int taskIndex) throws IOException {
-        List<String> lines = Files.readAllLines(FILE_PATH);
+    public void deleteTask(int taskIndex) throws IOException {
+        List<String> lines = Files.readAllLines(filePath);
         lines.remove(taskIndex);
-        Files.write(FILE_PATH, lines, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE); // overwrite entire file
+        Files.write(filePath, lines, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE); // overwrite entire file
     }
 
-    private static Task parseLine(String line) {
+    private Task parseLine(String line) {
         String trimmed = line.trim();
         if (trimmed.isEmpty()) {
             return null;
@@ -84,7 +90,7 @@ public class Storage {
         return task;
     }
 
-    private static String parseLine(Task task) {
+    private String parseLine(Task task) {
         String doneFlag = task.getStatusIcon().equals("X") ? "1" : "0";
         String description = task.getDescription();
 
@@ -106,11 +112,19 @@ public class Storage {
     }
 
 
-    public static void updateStorageFile(Task task) throws IOException {
+    public void updateStorageFile(Task task) throws IOException {
         String line = parseLine(task);
         String text = line + System.lineSeparator();
-        Files.writeString(FILE_PATH, text,
+        Files.writeString(filePath, text,
                 StandardOpenOption.CREATE,
                 StandardOpenOption.APPEND);
+    }
+
+    public void updateStorageFile(TaskList tasks) throws IOException {
+        ArrayList<String> lines = new ArrayList<>();
+        for (Task task : tasks.asUnmodifiableList()) {
+            lines.add(parseLine(task));
+        }
+        Files.write(filePath, lines, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE); // overwrite entire file
     }
 }
