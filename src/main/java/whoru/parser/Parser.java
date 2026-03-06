@@ -21,6 +21,8 @@ public class Parser {
             command = new AddEventCommand();
         } else if (fullCommand.startsWith("delete")) {
             command = new DeleteCommand();
+        } else if (fullCommand.startsWith("find")) {
+            command = new FindCommand();
         } else {
             command = new UnknownCommand();
         }

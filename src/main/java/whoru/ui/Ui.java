@@ -88,4 +88,10 @@ public class Ui {
         }
         return line;
     }
+
+    public void printNoTask() {
+        System.out.println(DIVIDE);
+        System.out.println(" No matching task found.");
+        System.out.println(DIVIDE);
+    }
 }

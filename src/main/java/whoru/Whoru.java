@@ -1,7 +1,6 @@
 package whoru;
 
 import whoru.command.Command;
-import whoru.exception.EmptyTaskCommandException;
 import whoru.parser.Parser;
 import whoru.storage.Storage;
 import whoru.ui.Ui;
