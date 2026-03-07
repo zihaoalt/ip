@@ -15,7 +15,21 @@ import java.time.format.DateTimeParseException;
 
 import static whoru.utils.formatter.formatErrorMessage;
 
+/**
+ * Represents a command that adds an event task
+ */
 public class AddEventCommand extends Command {
+    /**
+     * Parses the user input and adds an event task to the task list.
+     * Also saves the updated task list and displays the result to the user.
+     *
+     * @param tasks The tasklist to store the added deadline
+     * @param ui The ui object responsible for printing CLI results
+     * @param storage The storage object responsible for storing locally
+     * @param fullCommand The full string typed by the user
+     * @throws WhoruException If the command is missing description, missing a {@code /from} or {@code /to} time, or uses an invalid date.
+     */
+    @Override
     public void execute(TaskList tasks, Ui ui, Storage storage, String fullCommand) throws WhoruException {
         int fromIndex = fullCommand.indexOf("/from");
         int toIndex = fullCommand.indexOf("/to");
@@ -50,6 +64,12 @@ public class AddEventCommand extends Command {
 
     };
 
+    /**
+     * Returns whether this command terminates the application.
+     *
+     * @return {@code false}, because adding a task does not exit the application.
+     */
+    @Override
     public boolean isExit() {
         return false;
     };

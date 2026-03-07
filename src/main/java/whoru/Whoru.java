@@ -8,13 +8,21 @@ import whoru.tasklist.TaskList;
 import whoru.exception.WhoruException;
 import java.io.IOException;
 
-
+/**
+ * Main class of the Whoru application.
+ * Initializes the user interface, storage, and task list, and runs the command loop.
+ */
 public class Whoru {
 
     private final Storage storage;
     private TaskList tasks;
     private final Ui ui;
-
+    /**
+     * Creates a {@code Whoru} application using the specified storage file path.
+     * Loads existing tasks from storage if available.
+     *
+     * @param filePath Path of the file used to store task data.
+     */
     public Whoru(String filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
@@ -30,7 +38,11 @@ public class Whoru {
         Whoru whoru = new Whoru("data/whoru.txt");
         whoru.run();
     }
-
+    /**
+     * Runs the main command loop of the application.
+     * Repeatedly reads user input, parses it into a command, executes the command,
+     * and continues until an exit command is given.
+     */
     public void run() {
         ui.printWelcome();
         boolean isExit = false;

@@ -7,7 +7,9 @@ import whoru.task.Task;
 import whoru.tasklist.TaskList;
 import whoru.ui.Ui;
 
-import static whoru.utils.formatter.formatErrorMessage;
+/**
+ * Represents a mark command that mark the corresponding task of a number to be Done or Not Done
+ */
 
 public class MarkCommand extends Command {
     private final boolean shouldMarkDone;
@@ -16,6 +18,14 @@ public class MarkCommand extends Command {
         this.shouldMarkDone = shouldMarkDone;
     }
 
+    /**
+     * Parse user input to find task number and update in cache and local storage to be done or not done
+     * @param tasks Task list used by the application.
+     * @param ui User interface used to display messages.
+     * @param storage Storage used to persist task data.
+     * @param fullCommand Full command entered by the user.
+     * @throws WhoruException if task number out of index
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage, String fullCommand) throws WhoruException {
         //solution below inspired by https://github.com/NUS-CS2113-AY2526-S2/ip/pull/140 during code review practice
@@ -38,7 +48,11 @@ public class MarkCommand extends Command {
             throw new InvalidTaskNumberException("Please enter a valid task number");
         }
     }
-
+    /**
+     * Returns whether this command terminates the application.
+     *
+     * @return {@code false}, because marking a task done does not exit the application.
+     */
     @Override
     public boolean isExit() {
         return false;

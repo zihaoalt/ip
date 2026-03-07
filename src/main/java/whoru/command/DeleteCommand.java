@@ -11,7 +11,19 @@ import java.io.IOException;
 
 import static whoru.utils.formatter.formatErrorMessage;
 
+/**
+ * Represents a delete command that delete the task of corresponding number both in cache and in local storage
+ */
 public class DeleteCommand extends Command {
+    /**
+     * Attempts to find the task of corresponding number and delete then print message
+     *
+     * @param tasks Task list used by the application.
+     * @param ui User interface used to display messages.
+     * @param storage Storage used to persist task data.
+     * @param fullCommand Full command entered by the user.
+     * @throws WhoruException if failed to find the task index or io goes wrong when trying to update storage
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage, String fullCommand) throws WhoruException {
         //solution below inspired by https://github.com/NUS-CS2113-AY2526-S2/ip/pull/140 during code review practice
@@ -30,7 +42,11 @@ public class DeleteCommand extends Command {
             ui.printErrorMessage(e.getMessage());
         }
     }
-
+    /**
+     * Returns whether this command terminates the application.
+     *
+     * @return {@code false}, because deleting a task does not exit the application.
+     */
     @Override
     public boolean isExit() {
         return false;

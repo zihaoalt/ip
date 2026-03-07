@@ -1,8 +1,17 @@
 package whoru.parser;
 
 import whoru.command.*;
-
+/**
+ * Parses raw user input into the corresponding {@code Command} object.
+ */
 public class Parser {
+    /**
+     * Parses the full user input and returns the corresponding command.
+     *
+     * @param fullCommand Full command entered by the user.
+     * @return Command corresponding to the user input, or an {@code UnknownCommand}
+     *         if the input does not match any known command.
+     */
     public static Command parse(String fullCommand) {
         Command command = null;
         if (fullCommand.equalsIgnoreCase("bye")) {
