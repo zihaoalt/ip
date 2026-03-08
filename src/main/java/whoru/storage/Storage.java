@@ -21,7 +21,7 @@ import java.util.List;
  * The tasks stored will be of a specific format
  */
 public class Storage {
-    private static final String FORMAT = " | "; // this looks like space | space
+    private static final String FORMAT = " | ";
     private final Path filePath;
 
     public Storage(String filePath) {
@@ -94,23 +94,23 @@ public class Storage {
 
         Task task;
         switch (type) {
-            case "T":
-                task = new Todo(description);
-                break;
-            case "D":
-                if (arguments.length < 4) {
-                    return null;
-                }
-                task = new Deadline(description, LocalDate.parse(arguments[3]));
-                break;
-            case "E":
-                if (arguments.length < 5) {
-                    return null;
-                }
-                task = new Event(description, LocalDate.parse(arguments[3]), LocalDate.parse(arguments[4]));
-                break;
-            default:
+        case "T":
+            task = new Todo(description);
+            break;
+        case "D":
+            if (arguments.length < 4) {
                 return null;
+            }
+            task = new Deadline(description, LocalDate.parse(arguments[3]));
+            break;
+        case "E":
+            if (arguments.length < 5) {
+                return null;
+            }
+            task = new Event(description, LocalDate.parse(arguments[3]), LocalDate.parse(arguments[4]));
+            break;
+        default:
+            return null;
         }
 
         task.updateDoneStatus(isDone);
