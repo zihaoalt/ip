@@ -28,7 +28,6 @@ Example:
 
 - Words in `UPPER_CASE` are parameters to be supplied by the user.  
   Example: in `delete INDEX`, `INDEX` is the task number.
-- Items in square brackets are optional.
 - Commands should be typed exactly as shown.
 - Dates should be entered in `yyyy-MM-dd` format where applicable.
 - After each valid command, Whoru will show a response message.
@@ -44,7 +43,7 @@ Format:
 `todo DESCRIPTION`
 
 Example:
-`todo read software engineering notes`
+`todo read notes`
 
 ---
 
@@ -56,7 +55,7 @@ Format:
 `deadline DESCRIPTION /by DATE`
 
 Example:
-`deadline submit CS2113 iP /by 2026-03-18`
+`deadline submit Assignment 1 /by 2026-03-18`
 
 ---
 
